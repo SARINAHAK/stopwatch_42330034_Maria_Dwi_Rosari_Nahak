@@ -62,7 +62,7 @@ fun StopwatchScreen() {
 
         Text(
             text = formatTime(timeElapsed),
-            fontSize = 48.sp,
+            fontSize = 50.sp,
             color = Color(0xFF2196F3)
         )
 
