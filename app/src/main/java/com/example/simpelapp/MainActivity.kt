@@ -47,14 +47,15 @@ fun StopwatchScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5))
-            .padding(20.dp),
+            .padding(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Stopwatch",
+            text = "Stopwatch",cd
             fontSize = 32.sp,
             color = Color.Black
+
         )
 
         Spacer(modifier = Modifier.height(20.dp))
