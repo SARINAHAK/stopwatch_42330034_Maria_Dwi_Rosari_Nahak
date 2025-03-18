@@ -1,4 +1,4 @@
-package com.example.stopwatchapp
+package com.example.simpelapp
 
 import android.os.Bundle
 import android.os.SystemClock
@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +33,6 @@ fun StopwatchScreen() {
     var isRunning by remember { mutableStateOf(false) }
     var startTime by remember { mutableStateOf(0L) }
     val history = remember { mutableStateListOf<String>() }
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(isRunning) {
         while (isRunning) {
@@ -53,13 +51,11 @@ fun StopwatchScreen() {
     ) {
         Text(
             text = "Stopwatch",
-            fontSize = 32.sp,
+            fontSize = 24.sp,
             color = Color.Black
-
         )
 
         Spacer(modifier = Modifier.height(20.dp))
-
 
         Text(
             text = formatTime(timeElapsed),
@@ -69,50 +65,51 @@ fun StopwatchScreen() {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(
-            onClick = {
-                if (isRunning) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                onClick = {
+                    if (isRunning) {
+                        isRunning = false
+                        history.add(formatTime(timeElapsed))
+                    } else {
+                        startTime = SystemClock.elapsedRealtime() - timeElapsed
+                        isRunning = true
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isRunning) Color.Red else Color.Green
+                ),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = if (isRunning) "Pause" else "Start",
+                    fontSize = 20.sp,
+                    color = Color.White
+                )
+            }
+
+            Button(
+                onClick = {
                     isRunning = false
-                    history.add(formatTime(timeElapsed)) // Simpan ke riwayat
-                } else {
-                    startTime = SystemClock.elapsedRealtime() - timeElapsed
-                    isRunning = true
-                }
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (isRunning) Color.Red else Color.Green
-            ),
-            modifier = Modifier.fillMaxWidth(0.6f)
-        ) {
-            Text(
-                text = if (isRunning) "Pause" else "Start",
-                fontSize = 20.sp,
-                color = Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-
-        Button(
-            onClick = {
-                isRunning = false
-                timeElapsed = 0L
-                startTime = 0L
-                history.clear()
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-            modifier = Modifier.fillMaxWidth(0.6f)
-        ) {
-            Text(
-                text = "Reset",
-                fontSize = 18.sp,
-                color = Color.White
-            )
+                    timeElapsed = 0L
+                    startTime = 0L
+                    history.clear()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "Reset",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-
 
         if (history.isNotEmpty()) {
             Text(text = "Riwayat Waktu:", fontSize = 20.sp, color = Color.Black)
@@ -123,13 +120,24 @@ fun StopwatchScreen() {
                     .height(200.dp)
             ) {
                 items(history) { time ->
-                    Text(text = time, fontSize = 18.sp, color = Color.DarkGray)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        Text(
+                            text = time,
+                            fontSize = 18.sp,
+                            color = Color.DarkGray,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
                 }
             }
         }
     }
 }
-
 
 fun formatTime(timeMillis: Long): String {
     val minutes = (timeMillis / 60000) % 60
