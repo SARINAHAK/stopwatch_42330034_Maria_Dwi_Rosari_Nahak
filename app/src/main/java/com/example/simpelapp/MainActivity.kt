@@ -12,6 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ fun StopwatchScreen() {
     var isRunning by remember { mutableStateOf(false) }
     var startTime by remember { mutableStateOf(0L) }
     val history = remember { mutableStateListOf<String>() }
+    val lapTimes = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(isRunning) {
         while (isRunning) {
@@ -44,24 +47,36 @@ fun StopwatchScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF2196F3), Color(0xFF64B5F6))
+                )
+            )
             .padding(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = "Stopwatch",
-            fontSize = 24.sp,
-            color = Color.Black
+            fontSize = 30.sp,
+            color = Color.White
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = formatTime(timeElapsed),
-            fontSize = 50.sp,
-            color = Color(0xFF2196F3)
-        )
+        Card(
+            modifier = Modifier
+                .shadow(10.dp)
+                .padding(10.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Text(
+                text = formatTime(timeElapsed),
+                fontSize = 50.sp,
+                color = Color(0xFF2196F3),
+                modifier = Modifier.padding(20.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -82,7 +97,9 @@ fun StopwatchScreen() {
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isRunning) Color.Red else Color.Green
                 ),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .shadow(5.dp)
             ) {
                 Text(
                     text = if (isRunning) "Pause" else "Start",
@@ -96,10 +113,11 @@ fun StopwatchScreen() {
                     isRunning = false
                     timeElapsed = 0L
                     startTime = 0L
-                    history.clear()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .shadow(5.dp)
             ) {
                 Text(
                     text = "Reset",
@@ -109,29 +127,55 @@ fun StopwatchScreen() {
             }
         }
 
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Button(
+            onClick = {
+                if (isRunning) {
+                    lapTimes.add(formatTime(timeElapsed))
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow),
+            modifier = Modifier.shadow(5.dp)
+        ) {
+            Text(text = "Lap", fontSize = 18.sp, color = Color.Black)
+        }
+
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (history.isNotEmpty()) {
-            Text(text = "Riwayat Waktu:", fontSize = 20.sp, color = Color.Black)
-
+        if (lapTimes.isNotEmpty()) {
+            Text(text = "Lap Times:", fontSize = 20.sp, color = Color.White)
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
             ) {
-                items(history) { time ->
-                    Card(
+                items(lapTimes) { lap ->
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(4.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                            .padding(4.dp)
+                            .shadow(5.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = time,
-                            fontSize = 18.sp,
-                            color = Color.DarkGray,
-                            modifier = Modifier.padding(8.dp)
-                        )
+                        Card(
+                            modifier = Modifier.weight(1f),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Text(
+                                text = lap,
+                                fontSize = 18.sp,
+                                color = Color.DarkGray,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        Button(
+                            onClick = { lapTimes.remove(lap) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                            modifier = Modifier.padding(start = 5.dp)
+                        ) {
+                            Text(text = "X", color = Color.White)
+                        }
                     }
                 }
             }
