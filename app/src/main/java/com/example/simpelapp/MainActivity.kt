@@ -52,7 +52,7 @@ fun StopwatchScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Stopwatch",cd
+            text = "Stopwatch",
             fontSize = 32.sp,
             color = Color.Black
 
